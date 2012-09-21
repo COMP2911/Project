@@ -1,4 +1,5 @@
 package Quoridor;
+//changes made
 public class Board implements Display {
 	@Override
 	public void display(String moves) {
