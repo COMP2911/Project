@@ -24,11 +24,11 @@ public class Board implements Display {
 		for (int a = 0; a<17;a++){
 			for (int b = 0; b<9;b++){
 				if(a%2 == 0 || a == 0){
-					wall[a][b] = "   :";
+					wall[a][b] = "   |";
 					if (b == 8)
 						wall[a][b] = "    ";
 				} else if (a == 16) { 
-					wall[a][b] = "   :";
+					wall[a][b] = "   |";
 				} else {
 					wall[a][b] = "- -+";
 					if (b == 8)
