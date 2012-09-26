@@ -2,25 +2,52 @@ package quoridor;
 public class Board {
 	public static final int H = 0;
 	public static final int V = 1;
+	public static final int WHITE = 0;
+	public static final int BLACK = 1;
+	public static final int BLANK = 2;
 
+
+	public int currentTurn = WHITE;
 	private Tile[][] board;
-	int whitepawnposX;
-	int whitepawnposY;
-	int blackpawnposX;
-	int blackpawnposY;
-	
+	private boolean gameOver = false;
+	public Tile[] pawnPosition;
+
 	public Board (){
 		board = new Tile[9][9];	
+		pawnPosition = new Tile[2];
 		for (int j = 0; j<9; j++){
-			for (int i = 0; i<9; i++){	
+			for (int i = 0; i<9; i++)
 				board[i][j] = new Tile(i,j);
-			}
 		}
-		getTile(5,1).setPawnColour(1);
-		getTile(5,9).setPawnColour(2);
+		pawnPosition[WHITE] = getTile(5,1);
+		pawnPosition[BLACK] = getTile(5,9);
+		pawnPosition[WHITE].setPawnColour(WHITE);
+		pawnPosition[BLACK].setPawnColour(BLACK);
 	}
 	public Tile getTile(int x, int y){
 		return board[x-1][y-1];
+	}
+
+	public Tile getPawnPosition(int colour){
+		return pawnPosition[colour];
+	}
+	
+	public void play () {
+	}
+
+	private void alternateTurn() {
+		currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
+	}
+
+	public int whoseTurn () {
+		return currentTurn;
+	}
+	
+	private void start () {
+		while (!gameOver){
+			play();
+			alternateTurn();
+		}
 	}
 
 	public void addWall(int x, int y, int dir){
@@ -36,7 +63,7 @@ public class Board {
 			getTile(x+2,y+1).setWall(Tile.NORTH);	
 		}
 	}
-	
+
 	public void printBoard() {
 		Tile currTile;
 		char pawnTile;
@@ -46,9 +73,9 @@ public class Board {
 				currTile = getTile(i,j);
 				pawnTile = ' ';
 				wall = currTile.getWall(Tile.EAST) ? " H"  : " |"; 
-				if (currTile.getPawnColour() == 1)
+				if (currTile.getPawnColour() == WHITE)
 					pawnTile = 'w';
-				else if (currTile.getPawnColour() == 2)
+				else if (currTile.getPawnColour() == BLACK)
 					pawnTile = 'b';	
 				System.out.print(" "+pawnTile+wall);
 			}
@@ -67,39 +94,25 @@ public class Board {
 			currTile = getTile(i,9);
 			pawnTile = ' ';
 			wall = currTile.getWall(Tile.EAST) ? " H"  : " |"; 
-			if (currTile.getPawnColour() == 1)
+			if (currTile.getPawnColour() == WHITE)
 				pawnTile = 'w';
-			else if (currTile.getPawnColour() == 2)
+			else if (currTile.getPawnColour() == BLACK)
 				pawnTile = 'b';	
 			System.out.print(" "+pawnTile+wall);
 		}
 	}
-	
+
 	public static void main (String[] args){
-		Board newBoard = new Board();
-		newBoard.addWall(2,4,H);
-		newBoard.printBoard();
+		Board newGame = new Board();
+		Move move = new Move("e2");
+		Move movewall = new Move("b4h");
+		move.performMove(newGame);
+		movewall.performMove(newGame);
+		newGame.printBoard();
+		//newBoard.start();
+		
 	}
-
-	public void display(String moves) {
-		String[][] wall = new String[17][9];
-		for (int a = 0; a<17;a++){
-			for (int b = 0; b<9;b++){
-				if(a%2 == 0 || a == 0){
-					wall[a][b] = "   |";
-					if (b == 8)
-						wall[a][b] = "    ";
-				} else if (a == 16) { 
-					wall[a][b] = "   |";
-				} else {
-					wall[a][b] = "- -+";
-					if (b == 8)
-						wall[a][8] = "- -";
-				}					
-			}
-		}
-		/*
-
+	/*
 		String[] movelist = moves.split("\\s+");
 		//check if pawn move or wall
 		char[] index;
@@ -139,7 +152,7 @@ public class Board {
 				}
 			}
 		}
-		 
+
 		int n = 1;
 		System.out.println("     a   b   c   d   e   f   g   h   i\n");	
 		for (int j =0; j<17; j++ ){
@@ -154,6 +167,4 @@ public class Board {
 		}
 
 `	*/
-	}	
-
-}
+}	

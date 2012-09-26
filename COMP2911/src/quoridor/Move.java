@@ -16,7 +16,7 @@ public class Move {
 			else if (dir == 'h')
 				this.dir = Board.H;
 		}
-		if (this.dir == -1 || 
+		if (this.dir == -1 && move.length() == 3 || 
 			x < 1 || x > 9 || 
 			y < 1 || y > 9 || 
 			move.length() > 3) {
@@ -26,8 +26,16 @@ public class Move {
 	public boolean isLegalMove(Board board) {
 		return true;
 	}
-	public void performMove(Board board){
-
+	public Board performMove(Board board){
+		if (isLegalMove(board)){
+			if (dir == -1) {
+				board.getTile(x,y).setPawnColour(board.whoseTurn());
+				board.getPawnPosition(board.whoseTurn()).setPawnColour(board.BLANK);
+			} else {
+				board.addWall(x,y, dir);
+			}
+		}
+		return board;
 	} 
 
 	public String toString() {
