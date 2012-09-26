@@ -1,25 +1,125 @@
-package Quoridor;
-//changes made
-public class Board implements Display {
-	@Override
-	public void display(String moves) {
-		//get index;
-		int x=0,y=0;
+package quoridor;
 
-		char[][] pawn = new char[9][9];
-		for (int i = 0; i<9; i++){
-			for (int j = 0; i<9; i++){
-				pawn[i][j]=' ';
+public class Board {
+
+	Tile tile;
+	int whitepawnposX;
+	int whitepawnposY;
+	int blackpawnposX;
+	int blackpawnposY;
+
+
+	public Board (){
+		Tile westtile = new Tile(1,1);
+		Tile northtile = westtile;
+		Tile southtile, easttile; 
+		Tile temp = westtile;
+		tile = westtile;
+
+		for (int i = 2; i<=9; i++) {
+			easttile = new Tile(i,1);
+			easttile.setAdjacentTile(westtile, Tile.WEST);
+			westtile.setAdjacentTile(easttile, Tile.EAST);
+			westtile = easttile;
+		}
+		System.out.print("\n");
+		for (int i = 2; i<=9; i++){
+			southtile = new Tile (1,i);
+			northtile.setAdjacentTile(southtile, Tile.SOUTH);
+			southtile.setAdjacentTile(northtile, Tile.NORTH);
+			temp = northtile.getAdjacentTile(Tile.EAST); 
+			northtile = southtile;
+			westtile = southtile;
+			for (int j = 2; j<=9; j++){	
+
+				easttile = new Tile(j,i);
+
+				easttile.setAdjacentTile(westtile, Tile.WEST);
+				westtile.setAdjacentTile(easttile, Tile.EAST);
+				westtile = easttile;
+
+				easttile.setAdjacentTile(temp, Tile.NORTH);
+				temp.setAdjacentTile(easttile, Tile.SOUTH);
+				temp = temp.getAdjacentTile(Tile.EAST); 
 			}
 		}
-		pawn[5][1] = 'w';
-		pawn[5][8] = 'b';
+
+		whitepawnposX = 5;
+		whitepawnposY = 1;
+		blackpawnposX = 5;
+		blackpawnposY = 8;
+		getTile(5,1).setPawnColour(1);
+		getTile(5,9).setPawnColour(2);
+		//getTile(6,5).setWall(Tile.V);
+		getTile(2,4).setWall(Tile.H);
+	}
+
+	public Tile getTile(int x, int y){
+		Tile currTile = tile;
+		//System.out.println(currTile.getX() + "." + currTile.getY());
+		while (x-->1){	
+			currTile = currTile.getAdjacentTile(Tile.EAST);
+		}
+		while (y-->1)
+			currTile = currTile.getAdjacentTile(Tile.SOUTH);	
+		return currTile;
+	}
+
+	public static void main (String[] args){
+		Board newBoard = new Board();
+		Tile currTile = newBoard.tile;
+		Tile temp = currTile;
+		char pawnTile;
+		String wall;
+		while (currTile.getAdjacentTile(Tile.SOUTH) != null){		
+			temp = currTile;
+			
+			while (currTile.getAdjacentTile(Tile.EAST) != null){
+				//System.out.println(currTile.getX() + "." + currTile.getY());	
+				pawnTile = ' ';
+				wall = currTile.getWall(Tile.EAST) ? " H"  : " |"; 
+		
+				if (currTile.getPawnColour() == 1)
+					pawnTile = 'w';
+				else if (currTile.getPawnColour() == 2)
+					pawnTile = 'b';	
+				//System.out.print(" "+pawnTile+wall);
+				System.out.print(" "+ currTile.getX()+""+currTile.getY() +" ");
+			
+				//System.out.print(currTile.getPawnColour());	
+				currTile = currTile.getAdjacentTile(Tile.EAST);
+			}
+			System.out.print("\n");
+			currTile = newBoard.tile;
+			while (currTile.getAdjacentTile(Tile.EAST) != null){
+				//System.out.println(currTile.getX() + "." + currTile.getY());
+				wall = currTile.getWall(Tile.SOUTH) ? "===+"  : "- -+"; 
+				System.out.print(wall);
+				currTile = currTile.getAdjacentTile(Tile.EAST);
+			}
+			System.out.print("- -");
+			currTile = temp;
+			currTile = currTile.getAdjacentTile(Tile.SOUTH);
+			System.out.print("\n");
+		}
+		
+		while (currTile.getAdjacentTile(Tile.EAST) != null){
+			pawnTile = ' ';
+			wall = currTile.getWall(Tile.EAST) ? " H"  : " |"; 
+			if (currTile.getPawnColour() == 1)
+				pawnTile = 'w';
+			else if (currTile.getPawnColour() == 2)
+				pawnTile = 'b';	
+			System.out.print(" "+pawnTile+wall);
+			
+			currTile = currTile.getAdjacentTile(Tile.EAST);
+		}
+
+	}
+	public void display(String moves) {
+		//get index;
 
 
-		int whitePawnX = 5;
-		int whitePawnY = 1;
-		int blackPawnX = 5;
-		int blackPawnY = 8;
 		String[][] wall = new String[17][9];
 		for (int a = 0; a<17;a++){
 			for (int b = 0; b<9;b++){
@@ -36,6 +136,7 @@ public class Board implements Display {
 				}					
 			}
 		}
+		/*
 
 		String[] movelist = moves.split("\\s+");
 		//check if pawn move or wall
@@ -46,14 +147,14 @@ public class Board implements Display {
 			x = (int)index[0] - 96 - 1;
 			y = Character.getNumericValue(index[1]) - 1;	
 			if (movelist[j].length() == 2) {
-				
+
 				if (j%2 == 0 || j == 0) { //white
 					pawn[whitePawnY][whitePawnX] = ' ';
 					wall[whitePawnY*2][whitePawnX] = wall[whitePawnY*2][whitePawnX].substring(0,1) + ' ' + wall[whitePawnY*2][whitePawnX].substring(2,4);
 					whitePawnX = x;	
 					whitePawnY = y;
 					pawn[y][x] = 'w';
-					
+
 				} else {
 					pawn[blackPawnY][blackPawnX] = ' ';
 					wall[blackPawnY*2][blackPawnX] = wall[blackPawnY*2][blackPawnX].substring(0,1) + ' ' + wall[blackPawnY*2][blackPawnX].substring(2,4);
@@ -61,7 +162,7 @@ public class Board implements Display {
 					blackPawnY = y;
 					pawn[y][x] = 'b';
 				}
-				
+
 				wall[y*2][x] = wall[y*2][x].substring(0,1) + pawn[y][x] + wall[y*2][x].substring(2,4);
 				//System.out.println("x is "+ x + " y is " + y);
 			} else if(movelist[j].length() == 3) {
@@ -76,6 +177,7 @@ public class Board implements Display {
 				}
 			}
 		}
+		 */
 		int n = 1;
 		System.out.println("     a   b   c   d   e   f   g   h   i\n");	
 		for (int j =0; j<17; j++ ){
@@ -88,7 +190,7 @@ public class Board implements Display {
 			}
 			System.out.print("\n");
 		}
-		
+
 	}	
 
 }
