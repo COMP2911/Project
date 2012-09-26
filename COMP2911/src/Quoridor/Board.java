@@ -1,109 +1,70 @@
 package quoridor;
-
 public class Board {
+	public static final int H = 0;
+	public static final int V = 1;
 
-	Tile tile;
+	private Tile[][] board;
 	int whitepawnposX;
 	int whitepawnposY;
 	int blackpawnposX;
 	int blackpawnposY;
-
-
+	
 	public Board (){
-		Tile westtile = new Tile(1,1);
-		Tile northtile = westtile;
-		Tile southtile, easttile; 
-		Tile temp = westtile;
-		tile = westtile;
-
-		for (int i = 2; i<=9; i++) {
-			easttile = new Tile(i,1);
-			easttile.setAdjacentTile(westtile, Tile.WEST);
-			westtile.setAdjacentTile(easttile, Tile.EAST);
-			westtile = easttile;
-		}
-		System.out.print("\n");
-		for (int i = 2; i<=9; i++){
-			southtile = new Tile (1,i);
-			northtile.setAdjacentTile(southtile, Tile.SOUTH);
-			southtile.setAdjacentTile(northtile, Tile.NORTH);
-			temp = northtile.getAdjacentTile(Tile.EAST); 
-			northtile = southtile;
-			westtile = southtile;
-			for (int j = 2; j<=9; j++){	
-
-				easttile = new Tile(j,i);
-
-				easttile.setAdjacentTile(westtile, Tile.WEST);
-				westtile.setAdjacentTile(easttile, Tile.EAST);
-				westtile = easttile;
-
-				easttile.setAdjacentTile(temp, Tile.NORTH);
-				temp.setAdjacentTile(easttile, Tile.SOUTH);
-				temp = temp.getAdjacentTile(Tile.EAST); 
+		board = new Tile[9][9];	
+		for (int j = 0; j<9; j++){
+			for (int i = 0; i<9; i++){	
+				board[i][j] = new Tile(i,j);
 			}
 		}
-
-		whitepawnposX = 5;
-		whitepawnposY = 1;
-		blackpawnposX = 5;
-		blackpawnposY = 8;
 		getTile(5,1).setPawnColour(1);
 		getTile(5,9).setPawnColour(2);
-		//getTile(6,5).setWall(Tile.V);
-		getTile(2,4).setWall(Tile.H);
 	}
-
 	public Tile getTile(int x, int y){
-		Tile currTile = tile;
-		//System.out.println(currTile.getX() + "." + currTile.getY());
-		while (x-->1){	
-			currTile = currTile.getAdjacentTile(Tile.EAST);
-		}
-		while (y-->1)
-			currTile = currTile.getAdjacentTile(Tile.SOUTH);	
-		return currTile;
+		return board[x-1][y-1];
 	}
 
-	public static void main (String[] args){
-		Board newBoard = new Board();
-		Tile currTile = newBoard.tile;
-		Tile temp = currTile;
+	public void addWall(int x, int y, int dir){
+		if (dir == V) {
+			getTile(x,y+1).setWall(Tile.EAST);
+			getTile(x+1,y+1).setWall(Tile.WEST);			
+			getTile(x,y+2).setWall(Tile.EAST);
+			getTile(x+1,y+2).setWall(Tile.WEST);
+		} else if (dir == H) {
+			getTile(x+1,y).setWall(Tile.SOUTH);	
+			getTile(x+1,y+1).setWall(Tile.NORTH);	
+			getTile(x+2,y).setWall(Tile.SOUTH);	
+			getTile(x+2,y+1).setWall(Tile.NORTH);	
+		}
+	}
+	
+	public void printBoard() {
+		Tile currTile;
 		char pawnTile;
 		String wall;
-		while (currTile.getAdjacentTile(Tile.SOUTH) != null){		
-			temp = currTile;
-			
-			while (currTile.getAdjacentTile(Tile.EAST) != null){
-				//System.out.println(currTile.getX() + "." + currTile.getY());	
+		for (int j = 1; j<9; j++){
+			for (int i = 1; i<9; i++){	
+				currTile = getTile(i,j);
 				pawnTile = ' ';
 				wall = currTile.getWall(Tile.EAST) ? " H"  : " |"; 
-		
 				if (currTile.getPawnColour() == 1)
 					pawnTile = 'w';
 				else if (currTile.getPawnColour() == 2)
 					pawnTile = 'b';	
-				//System.out.print(" "+pawnTile+wall);
-				System.out.print(" "+ currTile.getX()+""+currTile.getY() +" ");
-			
-				//System.out.print(currTile.getPawnColour());	
-				currTile = currTile.getAdjacentTile(Tile.EAST);
+				System.out.print(" "+pawnTile+wall);
 			}
 			System.out.print("\n");
-			currTile = newBoard.tile;
-			while (currTile.getAdjacentTile(Tile.EAST) != null){
-				//System.out.println(currTile.getX() + "." + currTile.getY());
-				wall = currTile.getWall(Tile.SOUTH) ? "===+"  : "- -+"; 
+			for (int i = 1; i<9; i++){
+				currTile = getTile(i,j);
+				pawnTile = ' ';
+				wall = currTile.getWall(Tile.SOUTH) ? "===+"  : "---+"; 
 				System.out.print(wall);
-				currTile = currTile.getAdjacentTile(Tile.EAST);
 			}
-			System.out.print("- -");
-			currTile = temp;
-			currTile = currTile.getAdjacentTile(Tile.SOUTH);
+			wall = getTile(j,9).getWall(Tile.SOUTH) ? "==="  : "---"; 
+			System.out.print(wall);
 			System.out.print("\n");
 		}
-		
-		while (currTile.getAdjacentTile(Tile.EAST) != null){
+		for (int i = 1; i<9; i++){	
+			currTile = getTile(i,9);
 			pawnTile = ' ';
 			wall = currTile.getWall(Tile.EAST) ? " H"  : " |"; 
 			if (currTile.getPawnColour() == 1)
@@ -111,15 +72,16 @@ public class Board {
 			else if (currTile.getPawnColour() == 2)
 				pawnTile = 'b';	
 			System.out.print(" "+pawnTile+wall);
-			
-			currTile = currTile.getAdjacentTile(Tile.EAST);
 		}
-
 	}
+	
+	public static void main (String[] args){
+		Board newBoard = new Board();
+		newBoard.addWall(2,4,H);
+		newBoard.printBoard();
+	}
+
 	public void display(String moves) {
-		//get index;
-
-
 		String[][] wall = new String[17][9];
 		for (int a = 0; a<17;a++){
 			for (int b = 0; b<9;b++){
@@ -177,7 +139,7 @@ public class Board {
 				}
 			}
 		}
-		 */
+		 
 		int n = 1;
 		System.out.println("     a   b   c   d   e   f   g   h   i\n");	
 		for (int j =0; j<17; j++ ){
@@ -191,6 +153,7 @@ public class Board {
 			System.out.print("\n");
 		}
 
+`	*/
 	}	
 
 }

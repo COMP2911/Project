@@ -6,9 +6,6 @@ public class Tile {
 	public static final int SOUTH = 2;
 	public static final int WEST  = 3;
 	
-	public static final int H = 0;
-	public static final int V = 1;
-	
 	private Tile[] adjacenttile;
 	private boolean[] wall;
 	private int xpos;
@@ -32,14 +29,14 @@ public class Tile {
 	public void setWall(int dir) {
 		System.out.println(getX() +""+ getY());
 		Tile nexttile;
-		if (dir == V) {
+		if (dir == Board.V) {
 			wall[EAST] = true;
 			getAdjacentTile(EAST).wall[WEST] = true;
 			nexttile = getAdjacentTile(SOUTH);
 			nexttile.wall[EAST] = true;
 			nexttile.getAdjacentTile(EAST).wall[WEST] = true;
 		
-		} else if (dir == H) {
+		} else if (dir == Board.H) {
 			getAdjacentTile(EAST).wall[SOUTH] = true;
 			getAdjacentTile(EAST).getAdjacentTile(SOUTH).wall[NORTH] = true;
 			nexttile = getAdjacentTile(EAST).getAdjacentTile(EAST);
