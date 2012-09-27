@@ -1,11 +1,29 @@
 package quoridor;
-
+import java.util.Queue;
+import java.util.LinkedList;
 public class Move {
 	int x;
 	int y; 
 	int dir = -1;
 	Board board;
 	//test
+
+	public Move(int x, int y, Board board) {
+		this.board = board;
+		this.x = x;
+		this.y = y;
+		this.dir = dir;
+		this.board = board;
+	}
+
+	public Move(int x, int y, int dir, Board board) {
+		this.board = board;
+		this.x = x;
+		this.y = y;
+		this.dir = dir;
+		this.board = board;
+	}
+
 	public Move(String move, Board board) {
 		char dir;
 		this.board = board;
@@ -33,7 +51,7 @@ public class Move {
 		Tile pawn = board.getPawnPosition(board.whoseTurn());
 		px = pawn.getX();
 		py = pawn.getY();
-		
+
 		//no movement
 		if (px == x && py == y) return false;
 		//out of bounds
@@ -71,10 +89,40 @@ public class Move {
 		return legal;
 	}
 
+	//to fix;
 	private boolean checkGoalPath() {
-		return true;
+		//breadth search;
+		Board testPath = (Board)board.clone();
+		int[][] visited = new int[9][9];
+		Queue<Move> q = new LinkedList<Move>();
+		Move nextMove; 
+		for (int i = 0; i<4; i++)
+			q.add(testPath.pawnMove(i));
+		int path = 0;
+		visited[board.getPawnPosition(board.whoseTurn()).getX()][board.getPawnPosition(board.whoseTurn()).getY()] = path++;
+		boolean goal = false;
+		do {			
+			nextMove = q.remove();
+			for(int i = 0; i<4; i++){
+				testPath = (Board)board.clone();
+				q.add(testPath.pawnMove(i));	
+				if (nextMove != null && nextMove.isLegalMove()){
+					nextMove.performMove();
+					
+					visited[testPath.getPawnPosition(board.whoseTurn()).getX()][testPath.getPawnPosition(board.whoseTurn()).getY()] = path++;
+					q.add(testPath.pawnMove(i));
+				}
+			}
+			if (board.whoseTurn() == Board.BLACK && board.getPawnPosition(board.whoseTurn()).getY() == 1)
+				goal = true;
+			else if (board.whoseTurn() == Board.WHITE && board.getPawnPosition(board.whoseTurn()).getY() == 9)
+				goal = true;
+				
+		} while(!q.isEmpty() || goal == false);
+		
+		return goal;
 	}
-	
+
 	private boolean checkBlockedWalls(){
 		boolean blocked;
 		if (dir == Board.V)
@@ -83,7 +131,7 @@ public class Move {
 			blocked = board.getTile(x+1,y).getBlockWall(Tile.SOUTH);
 		return blocked;
 	}
-	
+
 	private boolean checkWallMove(){
 		boolean legal = true;
 		//invalid direction
@@ -98,7 +146,7 @@ public class Move {
 		//Board testPath = (Board)board.clone();
 		//testPath.addWall(x,y,dir);	
 		//if (!checkGoalPath()) legal = false;
-		
+
 		return legal;
 	}
 

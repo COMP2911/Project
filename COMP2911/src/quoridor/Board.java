@@ -6,6 +6,10 @@ public class Board implements Cloneable{
 	public static final int BLACK = 1;
 	public static final int BLANK = 2;
 
+	public static final int UP = 0;
+	public static final int DOWN = 1;
+	public static final int LEFT = 2;
+	public static final int RIGHT = 3;
 
 	public int currentTurn = BLACK;
 	private Tile[][] board;
@@ -25,6 +29,21 @@ public class Board implements Cloneable{
 		pawnPosition[BLACK].setPawnColour(BLACK);
 		//getTile(5,8).setPawnColour(BLACK);
 	}
+	
+	public Move pawnMove(int dir){
+		Move move = null;
+		Tile pawn = getPawnPosition(whoseTurn());
+		if (dir == UP)
+			move = new Move(pawn.getX(), pawn.getY()-1, this);
+		else if (dir == DOWN)
+			move = new Move(pawn.getX(), pawn.getY()+1, this);
+		else if (dir == LEFT)
+			move = new Move(pawn.getX()-1, pawn.getY(), this);
+		else 
+			move = new Move(pawn.getX()+1, pawn.getY(), this);
+		return move ;
+	}
+	
 	public Tile getTile(int x, int y){
 		return board[x-1][y-1];
 	}
@@ -144,11 +163,9 @@ public class Board implements Cloneable{
 
 	public static void main (String[] args){
 		Board newGame = new Board();
-		Move movewall = new Move("h7v", newGame);
+		Move movewall = new Move("d7h", newGame);
 		Move move = new Move("e8", newGame);
 		move.performMove();
-		movewall.performMove();	
-		movewall = new Move("e4h", newGame);
 		movewall.performMove();
 		newGame.printBoard();
 		//newBoard.start();
