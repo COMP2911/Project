@@ -1,5 +1,5 @@
 package quoridor;
-public class Board {
+public class Board implements Cloneable{
 	public static final int H = 0;
 	public static final int V = 1;
 	public static final int WHITE = 0;
@@ -34,9 +34,12 @@ public class Board {
 	}
 
 	public void setPawnPosition(int colour, Tile tile){
-		getPawnPosition(whoseTurn()).setPawnColour(BLANK);
-		pawnPosition[whoseTurn()] = tile ;
-		tile.setPawnColour(whoseTurn());
+		
+		//System.out.println(getPawnPosition(colour).getX()+" "+getPawnPosition(colour).getY());
+		getPawnPosition(colour).setPawnColour(BLANK);
+		pawnPosition[colour] = tile ;
+		tile.setPawnColour(colour);
+		//System.out.println(getPawnPosition(colour).getX()+" "+getPawnPosition(colour).getY());
 	}
 	
 	public void play () {
@@ -56,18 +59,48 @@ public class Board {
 			alternateTurn();
 		}
 	}
-
+	
+	public Object clone() {
+		Board newBoard = new Board();
+		newBoard.currentTurn = whoseTurn();
+		Tile cloneTile;
+		for(int j = 0; j < 9; j++){
+			for(int i = 0; i < 9; i++){
+				cloneTile = getTile(i+1,j+1);
+				newBoard.board[i][j] = new Tile(i+1,j+1);
+				for(int k = 0; k < 4; k++){
+					if (cloneTile.getWall(k))
+						newBoard.board[i][j].setWall(k);			
+				}
+			}
+		}	
+		newBoard.pawnPosition[WHITE] = newBoard.getTile(getPawnPosition(WHITE).getX(),getPawnPosition(WHITE).getY());
+		newBoard.pawnPosition[BLACK] = newBoard.getTile(getPawnPosition(BLACK).getX(), getPawnPosition(BLACK).getY());
+		newBoard.pawnPosition[WHITE].setPawnColour(WHITE);
+		newBoard.pawnPosition[BLACK].setPawnColour(BLACK);
+		return newBoard;
+	}
+	
+	
+	
 	public void addWall(int x, int y, int dir){
 		if (dir == V) {
 			getTile(x,y+1).setWall(Tile.EAST);
 			getTile(x+1,y+1).setWall(Tile.WEST);			
 			getTile(x,y+2).setWall(Tile.EAST);
 			getTile(x+1,y+2).setWall(Tile.WEST);
+			
+			getTile(x,y+1).blockWall(Tile.SOUTH);
+			getTile(x,y+2).blockWall(Tile.NORTH);
+			
 		} else if (dir == H) {
 			getTile(x+1,y).setWall(Tile.SOUTH);	
 			getTile(x+1,y+1).setWall(Tile.NORTH);	
 			getTile(x+2,y).setWall(Tile.SOUTH);	
-			getTile(x+2,y+1).setWall(Tile.NORTH);	
+			getTile(x+2,y+1).setWall(Tile.NORTH);
+	
+			getTile(x+1,y).blockWall(Tile.EAST);	
+			getTile(x+2,y).blockWall(Tile.WEST);			
 		}
 	}
 
@@ -93,7 +126,7 @@ public class Board {
 				wall = currTile.getWall(Tile.SOUTH) ? "===+"  : "---+"; 
 				System.out.print(wall);
 			}
-			wall = getTile(j,9).getWall(Tile.SOUTH) ? "==="  : "---"; 
+			wall = getTile(9,j).getWall(Tile.SOUTH) ? "==="  : "---"; 
 			System.out.print(wall);
 			System.out.print("\n");
 		}
@@ -111,19 +144,12 @@ public class Board {
 
 	public static void main (String[] args){
 		Board newGame = new Board();
-		//Move movewall = new Move("d7v", newGame);
+		Move movewall = new Move("h7v", newGame);
 		Move move = new Move("e8", newGame);
-		move.performMove(newGame);
-		Move move1 = new Move("e7", newGame);
-		move1.performMove(newGame);
-		Move move2 = new Move("f7", newGame);
-		move2.performMove(newGame);
-		Move move3 = new Move("f6", newGame);
-		move3.performMove(newGame);
-		//movewall.performMove(newGame);
-		
-		//Move move1 = new Move("f6", newGame);
-		//move1.performMove(newGame);
+		move.performMove();
+		movewall.performMove();	
+		movewall = new Move("e4h", newGame);
+		movewall.performMove();
 		newGame.printBoard();
 		//newBoard.start();
 		

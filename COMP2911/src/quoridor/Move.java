@@ -17,19 +17,15 @@ public class Move {
 				this.dir = Board.V;
 			else if (dir == 'h')
 				this.dir = Board.H;
+			else 
+				this.dir = -2;
 		}
 		if (this.dir == -1 && move.length() == 3 || 
 				x < 1 || x > 9 || 
 				y < 1 || y > 9 || 
 				move.length() > 3) {
-			System.out.println("Invalid Move");
 		}
 	}
-
-	private boolean outOfBounds(){
-		return true;
-	}
-
 
 	private boolean checkPawnMove(){
 		boolean legal = false;
@@ -38,8 +34,10 @@ public class Move {
 		px = pawn.getX();
 		py = pawn.getY();
 		
-		if (px == x && py == y)
-			return false;
+		//no movement
+		if (px == x && py == y) return false;
+		//out of bounds
+		if (x < 1 || x > 9 || y < 1 || y > 9) return false;
 		//up down & jump
 		if (x == px) {
 			//System.out.println(py + "-" + y + " " + board.whoseTurn());
@@ -49,7 +47,7 @@ public class Move {
 					y - py == 2 && !board.getTile(px,py+1).isEmpty() && !board.getTile(px,py+1).getWall(Tile.SOUTH) ){
 				legal = true;
 			}
-		
+
 		}
 		//left right & jump
 		if (y == py){
@@ -63,18 +61,45 @@ public class Move {
 		//diagonal jump
 		if (x != px && y != py){
 			if (px - x == 1 && py - y == 1 && !board.getTile(x,y+1).getWall(Tile.EAST)|| 
-				x - px == 1 && py - y == 1 && !board.getTile(x,y+1).getWall(Tile.WEST)||
-				px - x == 1 && y - py == 1 && !board.getTile(x,y-1).getWall(Tile.EAST)||
-				x - px == 1 && y - py == 1 && !board.getTile(x,y+1).getWall(Tile.WEST)){
+					x - px == 1 && py - y == 1 && !board.getTile(x,y+1).getWall(Tile.WEST)||
+					px - x == 1 && y - py == 1 && !board.getTile(x,y-1).getWall(Tile.EAST)||
+					x - px == 1 && y - py == 1 && !board.getTile(x,y+1).getWall(Tile.WEST)){
 				legal = true;
 			}
 		}
-	
+
 		return legal;
 	}
 
-	private boolean checkWallMove(){
+	private boolean checkGoalPath() {
 		return true;
+	}
+	
+	private boolean checkBlockedWalls(){
+		boolean blocked;
+		if (dir == Board.V)
+			blocked = board.getTile(x,y+1).getBlockWall(Tile.EAST);
+		else 
+			blocked = board.getTile(x+1,y).getBlockWall(Tile.SOUTH);
+		return blocked;
+	}
+	
+	private boolean checkWallMove(){
+		boolean legal = true;
+		//invalid direction
+		if (dir != Board.V && dir != Board.H) return false;
+		//edge walls
+		if (x == 9 || y == 9) return false;
+		if (dir == Board.V && y > 7) return false;
+		if (dir == Board.H && x > 7) return false;
+		//overlappingwalls
+		if (checkBlockedWalls()) legal = false;
+		//goal path;
+		//Board testPath = (Board)board.clone();
+		//testPath.addWall(x,y,dir);	
+		//if (!checkGoalPath()) legal = false;
+		
+		return legal;
 	}
 
 	public boolean isLegalMove() {
@@ -86,14 +111,14 @@ public class Move {
 		}
 		return legal;
 	}
-	public Board performMove(Board board){
+	public Board performMove(){
 		if (isLegalMove()){
-			if (dir == -1) {
+			if (dir == -1) 
 				board.setPawnPosition(board.whoseTurn(), board.getTile(x,y));	
-			} else {
-				board.addWall(x,y, dir);
-			}
-		}
+			else 
+				board.addWall(x,y, dir);		
+		} else 
+			System.out.println("Illegal Move");	
 		return board;
 	} 
 
