@@ -19,7 +19,7 @@ public class Tile {
 	}
 
 	public void setWall(int dir) {
-			wall[dir] = true;
+		wall[dir] = true;
 	}
 	public boolean getWall(int dir) {
 		return wall[dir];
@@ -37,5 +37,8 @@ public class Tile {
 	}
 	public int getPawnColour() {
 		return pawn;
+	}
+	public boolean isEmpty (){
+		return pawn == Board.BLANK;
 	}
 }

@@ -7,7 +7,7 @@ public class Board {
 	public static final int BLANK = 2;
 
 
-	public int currentTurn = WHITE;
+	public int currentTurn = BLACK;
 	private Tile[][] board;
 	private boolean gameOver = false;
 	public Tile[] pawnPosition;
@@ -17,19 +17,26 @@ public class Board {
 		pawnPosition = new Tile[2];
 		for (int j = 0; j<9; j++){
 			for (int i = 0; i<9; i++)
-				board[i][j] = new Tile(i,j);
+				board[i][j] = new Tile(i+1,j+1);
 		}
 		pawnPosition[WHITE] = getTile(5,1);
 		pawnPosition[BLACK] = getTile(5,9);
 		pawnPosition[WHITE].setPawnColour(WHITE);
 		pawnPosition[BLACK].setPawnColour(BLACK);
+		//getTile(5,8).setPawnColour(BLACK);
 	}
 	public Tile getTile(int x, int y){
 		return board[x-1][y-1];
 	}
-
+	
 	public Tile getPawnPosition(int colour){
 		return pawnPosition[colour];
+	}
+
+	public void setPawnPosition(int colour, Tile tile){
+		getPawnPosition(whoseTurn()).setPawnColour(BLANK);
+		pawnPosition[whoseTurn()] = tile ;
+		tile.setPawnColour(whoseTurn());
 	}
 	
 	public void play () {
@@ -104,10 +111,19 @@ public class Board {
 
 	public static void main (String[] args){
 		Board newGame = new Board();
-		Move move = new Move("e2");
-		Move movewall = new Move("b4h");
+		//Move movewall = new Move("d7v", newGame);
+		Move move = new Move("e8", newGame);
 		move.performMove(newGame);
-		movewall.performMove(newGame);
+		Move move1 = new Move("e7", newGame);
+		move1.performMove(newGame);
+		Move move2 = new Move("f7", newGame);
+		move2.performMove(newGame);
+		Move move3 = new Move("f6", newGame);
+		move3.performMove(newGame);
+		//movewall.performMove(newGame);
+		
+		//Move move1 = new Move("f6", newGame);
+		//move1.performMove(newGame);
 		newGame.printBoard();
 		//newBoard.start();
 		
